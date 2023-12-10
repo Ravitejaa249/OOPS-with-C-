@@ -1,0 +1,207 @@
+#include <iostream>
+#include <iomanip>
+#include <ctime>
+using namespace std;
+
+class Product {
+public:
+    int quantity;
+    string name;
+    double price;
+
+    double getTotal() const {
+        return price * quantity;
+    }
+};
+
+class Listt {
+public:
+    static const int max = 10;
+    Product items[max];
+    int count;
+
+    Listt() : count(0) {}
+
+    void addtocart(const Product &obj) {
+        if (count < max) {
+            items[count++] = obj;
+            cout << obj.name << " of quantity " << obj.quantity << " successfully added." << endl;
+        } else {
+            cout << "Cart is full. Cannot add this product to the bill." << endl;
+        }
+    }
+
+    void displayCart() const {
+        if (count == 0) {
+            cout << "The cart is empty." << endl;
+        } else {
+            cout << setw(20) << "Item" << setw(15) << "Price" << setw(10) << "Quantity" << setw(15) << "Total" << endl;
+            cout << setfill('-') << setw(60) << "" << setfill(' ') << endl;
+
+            for (int i = 0; i < count; ++i) {
+                const Product &obj = items[i];
+                cout << setw(20) << obj.name << setw(15) << fixed << setprecision(2) << obj.price << setw(10) << obj.quantity << setw(15) << obj.getTotal() << endl;
+            }
+        }
+    }
+
+    double calculateTotal() const {
+        double total = 0.0;
+        for (int i = 0; i < count; ++i) {
+            total += items[i].getTotal();
+        }
+        return total;
+    }
+};
+
+class BillingSystem {
+public:
+    Listt cart;
+
+    void addProduct(int quantity, string name, double price) {
+        Product product;
+        product.quantity = quantity;
+        product.name = name;
+        product.price = price;
+        cart.addtocart(product);
+    }
+
+    void displayCart() const {
+        cart.displayCart();
+    }
+
+    double generateBill(double disc) const {
+        double total = cart.calculateTotal();
+        cout << "\nBill Details:" << endl;
+        cout << setfill('-') << setw(60) << "" << setfill(' ') << endl;
+        cart.displayCart();
+        cout << "\n"
+             << setw(55) << "Total: Rs." << fixed << setprecision(2) << total << endl;
+        if (total > 5000) {
+        	total=total-(0.1*total);
+            cout << "coupon applied - 10% off ,the amount to be paid : Rs." << total  << endl;
+        } else if (total > 10000) {
+        	total=total - (0.2 * total);
+            cout << "Coupon applied - 20% off, the amount to be paid : Rs." << total  << endl;
+        }
+        if (disc != 0) {
+        	total = cart.calculateTotal();
+        	 double k=total*(0.01*disc);
+            cout << "After additional discount. The amount to be paid is : Rs." << total - k;
+        }
+        return total;
+    }
+
+    double get_disc(double b,double disc){
+       
+        double r = b * (0.01 * disc);
+         if(r<b){
+         	cout<<"";
+        double de = b - r;
+        cout << "Price after discount is : Rs." << fixed << setprecision(2) << de << endl;
+        return r;
+    }
+}
+};
+
+int main() {
+    BillingSystem supermarket;
+    int q, pr, c;
+     int itemIndex;
+     
+    string n;
+    double x = 0,disc=0;
+    cout << "***************************************** S U P E R M A R K E T  B I L L I N G *****************************************" << endl;
+    time_t ti;
+    time(&ti);
+    cout << ctime(&ti);
+    int choice;
+
+    do {
+        cout << "\n                         Menu" << endl;
+        cout << "1. Add Product" << setw(35) << "2. View Cart" << endl;
+        cout << "3. Generate Bill" << setw(42) << "4.Additional Discount" << endl;
+        cout << "5. Edit cart" << setw(33)<<"6.Exit. "<<endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+       
+        switch (choice) {
+        case 1: {
+            cout << "How many products do you wish to add : ";
+            cin >> c;
+            if (c > 10) {
+                cout << "Too many items. try again.";
+            } else {
+                for (int i = 0; i < c; i++) {
+                    cout << "Enter the product-" << i + 1 << " name: ";
+                    cin >> n;
+                    cout << "Enter the price of the product-" << i + 1 << ": ";
+                    cin >> pr;
+                    cout << "Enter the quantity of the product-" << i + 1 << " you wish to buy: ";
+                    cin >> q;
+
+                    supermarket.addProduct(q, n, pr);
+                }
+            }
+            break;
+        }
+        case 2: {
+        	cout<<endl;
+        	cout<<endl;
+        	cout<<endl;
+            cout << "Cart: " << endl;
+            supermarket.displayCart();
+            break;
+        }
+        case 3: {
+            x = supermarket.generateBill(disc);
+            break;
+        }
+        case 4: {
+            if (x > 0.0) {
+        cout << "Enter discount: " << endl;
+        cin >> disc;
+                x = supermarket.get_disc(x,disc);
+            } else {
+                cout << "Generate the bill first to get a discount!" << endl;
+            }
+            break;
+        }
+        case 5: {
+        	 if (supermarket.cart.count > 0) {
+               
+                cout << "Enter the index of the item you want to remove from the cart: ";
+                cin >> itemIndex;
+
+                if (itemIndex >= 0 && itemIndex < supermarket.cart.count) {
+                    for (int i = itemIndex; i < supermarket.cart.count - 1; ++i) {
+                        supermarket.cart.items[i] = supermarket.cart.items[i + 1];
+                    }
+                    --supermarket.cart.count;
+
+                    cout << "Item " << itemIndex + 1 << " removed from the cart." << endl;
+                } else {
+                    cout << "Invalid item index. Please enter a valid index." << endl;
+                }
+            } else {
+                cout << "Cart is empty. Nothing to remove." << endl;
+            }
+            break;
+        }
+        case 6: {
+           
+            break;
+        }
+        default: {
+            cout << "Invalid choice";
+            break;
+        
+        }}
+    }while (choice != 6);
+ cout<<endl;
+  cout<<endl;
+   cout<<endl;
+ 
+cout<<">>><<<-------------------------------------------THANK YOU FOR SHOPPING------------------------------------------->>><<<"<<endl;
+return 0;
+        }
